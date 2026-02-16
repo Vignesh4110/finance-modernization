@@ -38,23 +38,67 @@ def initialize_database():
         # Create data directory
         DB_PATH.parent.mkdir(parents=True, exist_ok=True)
         
+        # Create dbt profiles directory and file
+        dbt_profiles_dir = Path.home() / ".dbt"
+        dbt_profiles_dir.mkdir(parents=True, exist_ok=True)
+        
+        profiles_yml = dbt_profiles_dir / "profiles.yml"
+        profiles_yml.write_text("""
+finance_dw:
+  outputs:
+    dev:
+      type: duckdb
+      path: ./data/finance.duckdb
+      threads: 4
+  target: dev
+""")
+        
+        st.write(f"✅ Created dbt profiles at {profiles_yml}")
+        
         # Run dbt to build the database
         try:
             # Change to dbt project directory
             os.chdir(DBT_PROJECT)
             
-            # Run dbt seed and run
-            subprocess.run(["dbt", "seed", "--profiles-dir", str(Path.home() / ".dbt")], check=True, capture_output=True)
-            subprocess.run(["dbt", "run", "--profiles-dir", str(Path.home() / ".dbt")], check=True, capture_output=True)
+            # Run dbt seed
+            st.write("Running dbt seed...")
+            result = subprocess.run(
+                ["dbt", "seed", "--profiles-dir", str(dbt_profiles_dir)], 
+                capture_output=True, 
+                text=True
+            )
+            
+            if result.returncode != 0:
+                st.error(f"❌ dbt seed failed:")
+                st.code(result.stdout)
+                st.code(result.stderr)
+                return False
+            
+            st.write("✅ Seeds loaded")
+            
+            # Run dbt run
+            st.write("Running dbt models...")
+            result = subprocess.run(
+                ["dbt", "run", "--profiles-dir", str(dbt_profiles_dir)], 
+                capture_output=True, 
+                text=True
+            )
+            
+            if result.returncode != 0:
+                st.error(f"❌ dbt run failed:")
+                st.code(result.stdout)
+                st.code(result.stderr)
+                return False
             
             st.success("✅ Data warehouse built successfully!")
             
-        except subprocess.CalledProcessError as e:
-            st.error(f"❌ Error building database: {e}")
-            st.error(f"Output: {e.output}")
+        except FileNotFoundError:
+            st.error("❌ dbt command not found. Make sure dbt-core and dbt-duckdb are in requirements.txt")
             return False
         except Exception as e:
             st.error(f"❌ Unexpected error: {e}")
+            import traceback
+            st.code(traceback.format_exc())
             return False
         finally:
             # Change back to original directory
@@ -131,7 +175,6 @@ st.markdown('<div class="sub-header">Transforming Legacy AS400 Systems into Mode
 # SIDEBAR
 # ============================================================================
 with st.sidebar:
-    st.image("https://via.placeholder.com/150x150.png?text=💰", width=150)
     st.title("Finance Platform")
     st.markdown("*AS400 Modernization*")
     st.markdown("---")
