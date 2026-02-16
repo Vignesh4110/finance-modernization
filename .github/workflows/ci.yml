@@ -34,6 +34,19 @@ jobs:
       - name: Generate seed data
         run: python scripts/generate_seed_data.py
 
+      - name: Setup dbt profiles
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'PROFILE'
+          finance_dw:
+            outputs:
+              dev:
+                type: duckdb
+                path: ${{ github.workspace }}/data/finance.duckdb
+                threads: 4
+            target: dev
+          PROFILE
+
       - name: Run dbt
         working-directory: ./dbt_project
         run: |
@@ -48,7 +61,7 @@ jobs:
           count = conn.execute('SELECT COUNT(*) FROM main_marts.dim_customers').fetchone()[0]
           print(f'Customers: {count}')
           assert count > 0, 'No customers found'
-          print('✅ Data verification passed')
+          print('Data verification passed')
           "
 
   lint:
