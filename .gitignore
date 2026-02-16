@@ -48,3 +48,4 @@ airflow/airflow.db
 *.key
 credentials/venvas400/
 venvas400/
+.streamlit/secrets.toml
