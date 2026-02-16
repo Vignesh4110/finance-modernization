@@ -47,3 +47,4 @@ airflow/airflow.db
 *.pem
 *.key
 credentials/venvas400/
+venvas400/
