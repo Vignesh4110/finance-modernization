@@ -42,18 +42,20 @@ def initialize_database():
         dbt_profiles_dir = Path.home() / ".dbt"
         dbt_profiles_dir.mkdir(parents=True, exist_ok=True)
         
+        # Use absolute path for the database
         profiles_yml = dbt_profiles_dir / "profiles.yml"
-        profiles_yml.write_text("""
+        profiles_yml.write_text(f"""
 finance_dw:
   outputs:
     dev:
       type: duckdb
-      path: ./data/finance.duckdb
+      path: {DB_PATH.absolute()}
       threads: 4
   target: dev
 """)
         
         st.write(f"✅ Created dbt profiles at {profiles_yml}")
+        st.write(f"✅ Database will be created at: {DB_PATH.absolute()}")
         
         # Run dbt to build the database
         try:
@@ -153,15 +155,6 @@ st.markdown("""
         color: #666;
         margin-bottom: 2rem;
     }
-    .metric-card {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #1f77b4;
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 2rem;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -182,10 +175,6 @@ with st.sidebar:
     page = st.radio("Navigation", 
                    ["📊 AR Dashboard", "👥 Customer Analysis", 
                     "📋 Collection Worklist", "🤖 AI Assistant"])
-    
-    st.markdown("---")
-    st.markdown("### 🔧 Settings")
-    auto_refresh = st.checkbox("Auto-refresh (5 min)", value=False)
     
     st.markdown("---")
     st.markdown("### 📅 Last Updated")
@@ -275,7 +264,6 @@ if page == "📊 AR Dashboard":
 elif page == "👥 Customer Analysis":
     st.header("👥 Customer Analysis")
     
-    # Customer segment distribution
     segments = run_query("""
         SELECT 
             segment,
@@ -324,16 +312,7 @@ elif page == "📋 Collection Worklist":
 
 elif page == "🤖 AI Assistant":
     st.header("🤖 AI Assistant")
-    st.info("💡 AI features require Groq API key. Add it in Streamlit Cloud secrets as GROQ_API_KEY")
-    
-    query = st.text_area("Ask a question about your AR data:", 
-                        placeholder="e.g., Show me customers with over $50k outstanding")
-    
-    if st.button("Ask AI"):
-        if not os.getenv("GROQ_API_KEY"):
-            st.warning("⚠️ Please add GROQ_API_KEY to Streamlit secrets")
-        else:
-            st.info("🤖 AI integration coming soon!")
+    st.info("💡 AI features require Groq API key")
 
 # ============================================================================
 # FOOTER
@@ -342,6 +321,6 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
     <p><strong>Finance Modernization Platform</strong> | Built using Streamlit, dbt, Airflow & Groq AI from<br>
-    Existing AS400, DB2| © 2026 Vignesh</p>
+    Existing AS400, DB2 | © 2026 Vignesh</p>
 </div>
 """, unsafe_allow_html=True)
