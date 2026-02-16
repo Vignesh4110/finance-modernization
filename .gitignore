@@ -49,3 +49,7 @@ airflow/airflow.db
 credentials/venvas400/
 venvas400/
 .streamlit/secrets.toml
+# DuckDB database files
+*.duckdb
+*.duckdb.wal
+data/finance*.duckdb
