@@ -1,0 +1,52 @@
+name: 'finance_dw'
+version: '1.0.0'
+config-version: 2
+
+profile: 'finance_dw'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+models:
+  finance_dw:
+    # Staging models (Bronze → Silver)
+    staging:
+      +materialized: view
+      +schema: staging
+    
+    # Intermediate models (business logic)
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    
+    # Mart models (Silver → Gold)
+    marts:
+      +materialized: table
+      +schema: marts
+
+# Seed configurations
+seeds:
+  finance_dw:
+    +schema: raw
+
+# Variables
+vars:
+  # Date for AR aging calculations (default to today)
+  as_of_date: "current_date"
+  
+  # Aging bucket definitions (days)
+  aging_buckets:
+    current: 0
+    bucket_30: 30
+    bucket_60: 60
+    bucket_90: 90

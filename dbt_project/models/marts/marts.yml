@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension with aggregated AR and payment metrics"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: risk_category
+        description: "High Risk, Medium Risk, or Low Risk"
+        tests:
+          - accepted_values:
+              values: ['High Risk', 'Medium Risk', 'Low Risk']
+
+  - name: fct_ar_aging
+    description: "AR aging fact table - open invoices with aging buckets"
+    columns:
+      - name: invoice_number
+        description: "Primary key - Invoice number"
+        tests:
+          - unique
+          - not_null
+      - name: collection_priority_score
+        description: "Calculated score for collections prioritization (higher = more urgent)"
+
+  - name: metrics_ar_summary
+    description: "Executive summary metrics for AR"
+    columns:
+      - name: report_date
+        description: "Date the metrics were calculated"
+      - name: days_sales_outstanding
+        description: "DSO - key AR performance metric"

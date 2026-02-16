@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Cleaned customer data from AS400 CUSMAS"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: "Company name"
+        tests:
+          - not_null
+      - name: segment_code
+        description: "E, M, S, or T"
+        tests:
+          - accepted_values:
+              values: ['E', 'M', 'S', 'T', '']
+      - name: is_active
+        description: "True if account_status = A"
+
+  - name: stg_invoices
+    description: "Cleaned invoice data from AS400 ARMAS"
+    columns:
+      - name: invoice_number
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Foreign key to customers"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: invoice_amount
+        description: "Original invoice amount"
+        tests:
+          - not_null
+      - name: aging_bucket
+        description: "Current, 1-30, 31-60, 61-90, or 90+ Days"
+
+  - name: stg_payments
+    description: "Cleaned payment data from AS400 PAYTRAN"
+    columns:
+      - name: payment_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: payment_amount
+        description: "Payment amount"
+        tests:
+          - not_null
+      - name: is_applied
+        description: "True if payment has been applied to invoice"
+
+  - name: stg_gl_entries
+    description: "Cleaned GL journal entries from AS400 GLJRN"
+    columns:
+      - name: journal_id
+        description: "Journal entry ID (part of composite key)"
+        tests:
+          - not_null
+      - name: debit_amount
+        description: "Debit amount"
+      - name: credit_amount
+        description: "Credit amount"

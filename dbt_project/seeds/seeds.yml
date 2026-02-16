@@ -1,0 +1,113 @@
+version: 2
+
+seeds:
+  - name: cusmas
+    config:
+      column_types:
+        customer_id: bigint
+        customer_name: varchar
+        contact_name: varchar
+        address_line1: varchar
+        address_line2: varchar
+        city: varchar
+        state: varchar
+        zip_code: varchar
+        phone: varchar
+        email: varchar
+        region: varchar
+        industry_code: varchar
+        segment: varchar
+        customer_type: varchar
+        credit_limit: double
+        credit_used: double
+        payment_terms: integer
+        credit_status: varchar
+        account_status: varchar
+        created_date: date
+        updated_date: date
+        updated_time: varchar
+        updated_by: varchar
+
+  - name: armas
+    config:
+      column_types:
+        invoice_number: bigint
+        customer_id: bigint
+        invoice_date: date
+        due_date: date
+        ship_date: date
+        po_number: varchar
+        reference1: varchar
+        reference2: varchar
+        invoice_amount: double
+        tax_amount: double
+        freight_amount: double
+        discount_amount: double
+        amount_paid: double
+        current_balance: double
+        status: varchar
+        hold_flag: varchar
+        dispute_flag: varchar
+        dispute_reason: varchar
+        payment_terms: integer
+        document_type: varchar
+        division: varchar
+        gl_account: varchar
+        gl_post_date: date
+        gl_posted_flag: varchar
+        created_date: date
+        updated_date: date
+        updated_time: varchar
+        updated_by: varchar
+        batch_session: bigint
+
+  - name: paytran
+    config:
+      column_types:
+        payment_id: bigint
+        customer_id: bigint
+        payment_date: date
+        payment_amount: double
+        payment_method: varchar
+        check_number: varchar
+        bank_reference: varchar
+        remittance_name: varchar
+        invoice_reference: bigint
+        applied_flag: varchar
+        applied_date: date
+        applied_amount: double
+        unapplied_amount: double
+        payment_type: varchar
+        status: varchar
+        batch_session: bigint
+        batch_id: varchar
+        created_date: date
+        updated_date: date
+        updated_time: varchar
+        updated_by: varchar
+
+  - name: gljrn
+    config:
+      column_types:
+        journal_id: bigint
+        line_number: integer
+        post_date: date
+        period: integer
+        fiscal_year: integer
+        gl_account: varchar
+        department: varchar
+        project: varchar
+        debit_amount: double
+        credit_amount: double
+        description: varchar
+        reference: varchar
+        source: varchar
+        document_type: varchar
+        status: varchar
+        reversal_flag: varchar
+        reversal_journal: bigint
+        created_date: date
+        updated_date: date
+        updated_time: varchar
+        updated_by: varchar
+        batch_session: bigint
