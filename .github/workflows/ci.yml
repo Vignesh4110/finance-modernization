@@ -26,7 +26,7 @@ jobs:
 
       - name: Create directories
         run: |
-          mkdir -p data
+          mkdir -p dbt_project/data
           mkdir -p ~/.dbt
 
       - name: Create dbt profiles
@@ -58,7 +58,7 @@ jobs:
           python << 'PYEOF'
           import duckdb
           
-          conn = duckdb.connect('data/finance.duckdb')
+          conn = duckdb.connect('dbt_project/data/finance.duckdb')
           
           # Check raw seed tables
           print("=" * 50)
