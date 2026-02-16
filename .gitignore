@@ -46,4 +46,4 @@ airflow/airflow.db
 # Secrets
 *.pem
 *.key
-credentials/
+credentials/venvas400/
