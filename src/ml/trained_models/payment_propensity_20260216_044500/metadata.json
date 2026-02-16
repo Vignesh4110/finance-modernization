@@ -1,0 +1,46 @@
+{
+  "feature_names": [
+    "invoice_amount",
+    "tax_amount",
+    "payment_terms",
+    "days_since_invoice",
+    "days_past_due",
+    "total_amount",
+    "is_large_invoice",
+    "is_disputed",
+    "credit_limit",
+    "customer_payment_count",
+    "customer_total_paid",
+    "customer_application_rate",
+    "segment_encoded",
+    "region_MW",
+    "region_NE",
+    "region_SE",
+    "region_SW",
+    "region_WE",
+    "credit_status_encoded"
+  ],
+  "metrics": {
+    "accuracy": 0.817,
+    "precision": 0.8088235294117647,
+    "recall": 0.9807956104252401,
+    "f1": 0.8865468071915685,
+    "roc_auc": 0.7003730531132472,
+    "training_samples": 4000,
+    "validation_samples": 1000,
+    "n_features": 19
+  },
+  "params": {
+    "n_estimators": 100,
+    "max_depth": 5,
+    "learning_rate": 0.1,
+    "min_child_weight": 3,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "objective": "binary:logistic",
+    "random_state": 42,
+    "n_jobs": -1,
+    "eval_metric": "auc"
+  },
+  "trained_at": "2026-02-16T04:45:00.539838"
+}
