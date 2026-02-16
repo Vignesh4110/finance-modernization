@@ -53,3 +53,7 @@ venvas400/
 *.duckdb
 *.duckdb.wal
 data/finance*.duckdb
+
+# All DuckDB files everywhere
+**/*.duckdb
+**/*.duckdb.wal
