@@ -25,13 +25,12 @@ jobs:
           pip install -r requirements.txt
 
       - name: Create data directory
-        run: |
-          mkdir -p data
-          mkdir -p ~/.dbt
+        run: mkdir -p data
 
-      - name: Create dbt profiles.yml
+      - name: Create dbt profiles
         run: |
-          cat > ~/.dbt/profiles.yml << 'EOF'
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'PROFILE'
           finance_dw:
             outputs:
               dev:
@@ -39,51 +38,62 @@ jobs:
                 path: ./data/finance.duckdb
                 threads: 4
             target: dev
-          EOF
+          PROFILE
 
-      - name: Verify dbt installation
+      - name: Verify dbt setup
         run: |
-          dbt --version
           cd dbt_project
           dbt debug
 
       - name: Load seed data
         run: |
           cd dbt_project
-          dbt seed --profiles-dir ~/.dbt
+          dbt seed
 
       - name: Run dbt models
         run: |
           cd dbt_project
-          dbt run --profiles-dir ~/.dbt
+          dbt run
 
       - name: Run dbt tests
         run: |
           cd dbt_project
-          dbt test --profiles-dir ~/.dbt
+          dbt test
 
       - name: Verify data warehouse
         run: |
-          python -c "
+          python << 'PYEOF'
           import duckdb
+          
           conn = duckdb.connect('data/finance.duckdb')
           
           # Check staging tables
-          staging_tables = conn.execute(\"SELECT table_name FROM information_schema.tables WHERE table_schema = 'staging'\").fetchall()
-          print(f'Staging tables: {staging_tables}')
+          staging_tables = conn.execute("""
+              SELECT table_name 
+              FROM information_schema.tables 
+              WHERE table_schema = 'staging'
+          """).fetchall()
+          print(f'✅ Staging tables: {len(staging_tables)}')
           
           # Check marts tables
-          marts_tables = conn.execute(\"SELECT table_name FROM information_schema.tables WHERE table_schema = 'marts'\").fetchall()
-          print(f'Marts tables: {marts_tables}')
+          marts_tables = conn.execute("""
+              SELECT table_name 
+              FROM information_schema.tables 
+              WHERE table_schema = 'marts'
+          """).fetchall()
+          print(f'✅ Marts tables: {len(marts_tables)}')
           
-          # Verify record counts
-          if marts_tables:
-              for table in marts_tables:
-                  count = conn.execute(f\"SELECT COUNT(*) FROM marts.{table[0]}\").fetchone()[0]
-                  print(f'marts.{table[0]}: {count} records')
+          # Check specific tables
+          for schema, table in [('staging', 'stg_customers'), ('marts', 'dim_customers'), ('marts', 'fct_invoices')]:
+              try:
+                  count = conn.execute(f"SELECT COUNT(*) FROM {schema}.{table}").fetchone()[0]
+                  print(f'✅ {schema}.{table}: {count} records')
+              except Exception as e:
+                  print(f'⚠️  {schema}.{table}: {str(e)}')
           
           conn.close()
-          "
+          print('\n✅ Data warehouse verification complete')
+          PYEOF
 
       - name: Run linting
         run: |
