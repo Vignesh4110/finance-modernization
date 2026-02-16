@@ -24,12 +24,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create data directory
-        run: mkdir -p data
+      - name: Create directories
+        run: |
+          mkdir -p data
+          mkdir -p ~/.dbt
 
       - name: Create dbt profiles
         run: |
-          mkdir -p ~/.dbt
           cat > ~/.dbt/profiles.yml << 'PROFILE'
           finance_dw:
             outputs:
@@ -41,24 +42,20 @@ jobs:
           PROFILE
 
       - name: Verify dbt setup
-        run: |
-          cd dbt_project
-          dbt debug
+        working-directory: ./dbt_project
+        run: dbt debug
 
       - name: Load seed data
-        run: |
-          cd dbt_project
-          dbt seed
+        working-directory: ./dbt_project
+        run: dbt seed --full-refresh
 
       - name: Run dbt models
-        run: |
-          cd dbt_project
-          dbt run
+        working-directory: ./dbt_project
+        run: dbt run --full-refresh
 
       - name: Run dbt tests
-        run: |
-          cd dbt_project
-          dbt test
+        working-directory: ./dbt_project
+        run: dbt test
 
       - name: Verify data warehouse
         run: |
@@ -67,35 +64,68 @@ jobs:
           
           conn = duckdb.connect('data/finance.duckdb')
           
+          # Check raw seed tables
+          print("=" * 50)
+          print("SEED DATA (Raw Schema)")
+          print("=" * 50)
+          raw_tables = conn.execute("""
+              SELECT table_name 
+              FROM information_schema.tables 
+              WHERE table_schema = 'raw'
+              ORDER BY table_name
+          """).fetchall()
+          
+          for table in raw_tables:
+              count = conn.execute(f"SELECT COUNT(*) FROM raw.{table[0]}").fetchone()[0]
+              print(f"✅ raw.{table[0]:<15} {count:>6,} records")
+          
           # Check staging tables
+          print("\n" + "=" * 50)
+          print("STAGING LAYER (Silver)")
+          print("=" * 50)
           staging_tables = conn.execute("""
               SELECT table_name 
               FROM information_schema.tables 
               WHERE table_schema = 'staging'
+              ORDER BY table_name
           """).fetchall()
-          print(f'✅ Staging tables: {len(staging_tables)}')
+          
+          if staging_tables:
+              for table in staging_tables:
+                  count = conn.execute(f"SELECT COUNT(*) FROM staging.{table[0]}").fetchone()[0]
+                  print(f"✅ staging.{table[0]:<15} {count:>6,} records")
+          else:
+              print("⚠️  No staging tables found")
           
           # Check marts tables
+          print("\n" + "=" * 50)
+          print("MARTS LAYER (Gold)")
+          print("=" * 50)
           marts_tables = conn.execute("""
               SELECT table_name 
               FROM information_schema.tables 
               WHERE table_schema = 'marts'
+              ORDER BY table_name
           """).fetchall()
-          print(f'✅ Marts tables: {len(marts_tables)}')
           
-          # Check specific tables
-          for schema, table in [('staging', 'stg_customers'), ('marts', 'dim_customers'), ('marts', 'fct_invoices')]:
-              try:
-                  count = conn.execute(f"SELECT COUNT(*) FROM {schema}.{table}").fetchone()[0]
-                  print(f'✅ {schema}.{table}: {count} records')
-              except Exception as e:
-                  print(f'⚠️  {schema}.{table}: {str(e)}')
+          if marts_tables:
+              for table in marts_tables:
+                  count = conn.execute(f"SELECT COUNT(*) FROM marts.{table[0]}").fetchone()[0]
+                  print(f"✅ marts.{table[0]:<15} {count:>6,} records")
+          else:
+              print("⚠️  No marts tables found")
           
           conn.close()
-          print('\n✅ Data warehouse verification complete')
+          print("\n" + "=" * 50)
+          print("✅ DATA WAREHOUSE VERIFICATION COMPLETE")
+          print("=" * 50)
           PYEOF
 
-      - name: Run linting
+      - name: Generate dbt docs
+        working-directory: ./dbt_project
+        run: dbt docs generate
+
+      - name: Run Python linting
         run: |
           pip install flake8
           flake8 src/ scripts/ --max-line-length=120 \
@@ -118,6 +148,5 @@ jobs:
         run: pip install sqlfluff sqlfluff-templater-dbt
 
       - name: Lint SQL files
-        run: |
-          cd dbt_project
-          sqlfluff lint models/ --dialect duckdb || true
+        working-directory: ./dbt_project
+        run: sqlfluff lint models/ --dialect duckdb || true
