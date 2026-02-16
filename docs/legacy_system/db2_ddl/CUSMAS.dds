@@ -1,0 +1,91 @@
+A*****************************************************************
+     A* CUSMAS - Customer Master Physical File
+     A* System: FINPROD
+     A* Created: 1998-03-15 by JSMITH
+     A* Modified: 2019-07-22 by MWILSON - Added email field
+     A*
+     A* This file contains all customer demographic and credit info
+     A* Key: CMCUST (Customer Number)
+     A* Record Length: 350 bytes
+     A*****************************************************************
+     A                                      UNIQUE
+     A          R CUSMASR                   TEXT('Customer Master Record')
+     A*
+     A*         ------- KEY FIELDS -------
+     A            CMCUST         6P 0       TEXT('Customer Number')
+     A                                      COLHDG('Cust' 'Number')
+     A*
+     A*         ------- NAME AND ADDRESS -------
+     A            CMNAME        40A         TEXT('Customer Name')
+     A                                      COLHDG('Customer' 'Name')
+     A            CMCONT        30A         TEXT('Contact Name')
+     A                                      COLHDG('Contact' 'Name')
+     A            CMADR1        40A         TEXT('Address Line 1')
+     A                                      COLHDG('Address' 'Line 1')
+     A            CMADR2        40A         TEXT('Address Line 2')
+     A                                      COLHDG('Address' 'Line 2')
+     A            CMCITY        25A         TEXT('City')
+     A                                      COLHDG('City')
+     A            CMSTAT         2A         TEXT('State Code')
+     A                                      COLHDG('ST')
+     A            CMZIPC        10A         TEXT('Zip Code')
+     A                                      COLHDG('Zip' 'Code')
+     A            CMPHON        10P 0       TEXT('Phone Number')
+     A                                      COLHDG('Phone')
+     A            CMEMAL        50A         TEXT('Email Address')
+     A                                      COLHDG('Email' 'Address')
+     A*
+     A*         ------- CLASSIFICATION -------
+     A            CMREGN         2A         TEXT('Region Code')
+     A                                      COLHDG('Rgn')
+     A                                      VALUES('NE' 'SE' 'MW' 'SW' 'WE')
+     A            CMINDS         3A         TEXT('Industry Code')
+     A                                      COLHDG('Ind')
+     A            CMSEGM         1A         TEXT('Customer Segment')
+     A                                      COLHDG('Seg')
+     A                                      VALUES('E' 'M' 'S' 'T')
+     A            CMTYPE         1A         TEXT('Customer Type')
+     A                                      COLHDG('Typ')
+     A                                      DFT('R')
+     A                                      VALUES('R' 'G' 'I')
+     A*
+     A*         ------- CREDIT INFORMATION -------
+     A            CMCRLT        11P 2       TEXT('Credit Limit')
+     A                                      COLHDG('Credit' 'Limit')
+     A            CMCRUS        11P 2       TEXT('Credit Used')
+     A                                      COLHDG('Credit' 'Used')
+     A            CMPMTM         3P 0       TEXT('Payment Terms Days')
+     A                                      COLHDG('Pmt' 'Terms')
+     A                                      DFT(30)
+     A            CMCRST         1A         TEXT('Credit Status')
+     A                                      COLHDG('Cr' 'St')
+     A                                      DFT('A')
+     A                                      VALUES('A' 'H' 'S')
+     A*
+     A*         ------- STATUS AND AUDIT -------
+     A            CMSTAT2        1A         TEXT('Account Status')
+     A                                      COLHDG('Acct' 'Stat')
+     A                                      DFT('A')
+     A                                      VALUES('A' 'I' 'C')
+     A            CMCDAT         7P 0       TEXT('Create Date CYYMMDD')
+     A                                      COLHDG('Create' 'Date')
+     A            CMUDAT         7P 0       TEXT('Last Update Date CYYMMDD')
+     A                                      COLHDG('Update' 'Date')
+     A            CMUTIM         6P 0       TEXT('Last Update Time HHMMSS')
+     A                                      COLHDG('Update' 'Time')
+     A            CMUUSR        10A         TEXT('Last Update User')
+     A                                      COLHDG('Update' 'User')
+     A*
+     A          K CMCUST
+     A*****************************************************************
+     A* FIELD SUMMARY:
+     A* Packed Decimal Fields: CMCUST(6,0), CMPHON(10,0), CMCRLT(11,2),
+     A*                        CMCRUS(11,2), CMPMTM(3,0), CMCDAT(7,0),
+     A*                        CMUDAT(7,0), CMUTIM(6,0)
+     A* Character Fields: CMNAME(40), CMCONT(30), CMADR1(40), CMADR2(40),
+     A*                   CMCITY(25), CMSTAT(2), CMZIPC(10), CMEMAL(50),
+     A*                   CMREGN(2), CMINDS(3), CMSEGM(1), CMTYPE(1),
+     A*                   CMCRST(1), CMSTAT2(1), CMUUSR(10)
+     A*
+     A* Total Record Length: 350 bytes
+     A*****************************************************************
