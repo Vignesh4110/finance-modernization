@@ -1,0 +1,49 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.env.local
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/raw/*
+!data/raw/.gitkeep
+logs/
+*.log
+
+# Docker
+docker/volumes/
+
+# dbt
+dbt_packages/
+target/
+logs/
+
+# MLflow
+mlruns/
+
+# Airflow
+airflow/logs/
+airflow/airflow.db
+
+# Secrets
+*.pem
+*.key
+credentials/
