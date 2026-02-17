@@ -196,7 +196,7 @@ if page == "📊 AR Dashboard":
             SUM(current_balance) as total_ar,
             AVG(days_outstanding) as avg_days,
             SUM(CASE WHEN days_outstanding > 90 THEN current_balance ELSE 0 END) as past_due_90
-        FROM marts.fct_invoices
+        FROM main_marts.fct_invoices
         WHERE status = 'OP'
     """)
     
@@ -222,7 +222,7 @@ if page == "📊 AR Dashboard":
                 aging_bucket,
                 SUM(current_balance) as balance,
                 COUNT(*) as invoice_count
-            FROM marts.fct_ar_aging
+            FROM main_marts.fct_ar_aging
             GROUP BY aging_bucket
             ORDER BY 
                 CASE aging_bucket
@@ -246,8 +246,8 @@ if page == "📊 AR Dashboard":
             SELECT 
                 customer_name,
                 SUM(current_balance) as balance
-            FROM marts.fct_invoices f
-            JOIN marts.dim_customers c ON f.customer_id = c.customer_id
+            FROM main_marts.fct_invoices f
+            JOIN main_marts.dim_customers c ON f.customer_id = c.customer_id
             WHERE status = 'OP'
             GROUP BY customer_name
             ORDER BY balance DESC
@@ -270,7 +270,7 @@ elif page == "👥 Customer Analysis":
             COUNT(*) as customer_count,
             SUM(credit_limit) as total_credit,
             SUM(credit_used) as total_used
-        FROM marts.dim_customers
+        FROM main_marts.dim_customers
         GROUP BY segment
     """)
     
@@ -297,8 +297,8 @@ elif page == "📋 Collection Worklist":
             SUM(current_balance) as balance,
             MAX(days_outstanding) as max_days,
             COUNT(*) as invoice_count
-        FROM marts.fct_invoices f
-        JOIN marts.dim_customers c ON f.customer_id = c.customer_id
+        FROM main_marts.fct_invoices f
+        JOIN main_marts.dim_customers c ON f.customer_id = c.customer_id
         WHERE status = 'OP' AND days_outstanding > 60
         GROUP BY customer_name
         ORDER BY balance DESC
