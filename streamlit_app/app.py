@@ -124,6 +124,8 @@ def query_llm(prompt, system_prompt="You are a helpful AR/finance assistant."):
     
     try:
         from groq import Groq
+        
+        # Create client without proxies parameter
         client = Groq(api_key=GROQ_API_KEY)
         
         response = client.chat.completions.create(
@@ -137,8 +139,11 @@ def query_llm(prompt, system_prompt="You are a helpful AR/finance assistant."):
         )
         
         return response.choices[0].message.content
+        
+    except ImportError:
+        return "❌ Error: groq package not installed"
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        return f"❌ Error calling Groq API: {str(e)}"
 
 def generate_collection_email(customer_name, balance, days_overdue):
     """Generate collection email"""
